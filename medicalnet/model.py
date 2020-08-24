@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-from models import resnet
+from .models import resnet
 
 
 def generate_model(opt):
@@ -85,7 +85,10 @@ def generate_model(opt):
     # load pretrain
     if opt.phase != 'test' and opt.pretrain_path:
         print ('loading pretrained model {}'.format(opt.pretrain_path))
-        pretrain = torch.load(opt.pretrain_path)
+        if not opt.no_cuda:
+            pretrain = torch.load(opt.pretrain_path)
+        else:
+            pretrain = torch.load(opt.pretrain_path, map_location=torch.device('cpu'))
         pretrain_dict = {k: v for k, v in pretrain['state_dict'].items() if k in net_dict.keys()}
          
         net_dict.update(pretrain_dict)
